@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>冷蔵庫メニュー相談</title>
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#d7b996" />
+  <style>
+    :root{
+      --bg:#fff8ef;--panel:#fff1df;--panel2:#f6e3cd;--line:#9b7653;--deep:#5d4037;--accent:#c9935d;--accent2:#e4bea0;--blue:#d9e7f4;--danger:#b84535;--white:#fffdf9;
+    }
+    *{box-sizing:border-box} body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:linear-gradient(135deg,#fff8ef,#f2e2d0);color:#35251d;font-weight:650} 
+    .wrap{max-width:1180px;margin:0 auto;padding:18px}.app{border:3px solid var(--line);background:#f3e8dc;border-radius:18px;padding:16px;box-shadow:0 8px 25px rgba(80,50,25,.14)}
+    header{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:14px} h1{font-size:24px;margin:0;color:var(--deep)}
+    .tabs{display:flex;gap:8px}.tab{border:2px solid var(--line);background:#fff8ef;color:var(--deep);border-radius:999px;padding:12px 22px;font-size:16px;font-weight:800;cursor:pointer}.tab.active{background:var(--accent);color:white}
+    .topgrid{display:grid;grid-template-columns:1fr 1fr 180px 180px;gap:12px;margin:10px 0 16px}.field{background:var(--white);border:2px solid #d6b895;border-radius:12px;padding:10px}.field label{display:block;font-size:13px;margin-bottom:6px;color:#6a4b36} input,select,textarea{width:100%;border:2px solid #ddc4a8;border-radius:10px;padding:12px;font-size:16px;background:#fff;color:#35251d;font-weight:650} textarea{min-height:285px;resize:vertical;line-height:1.55}
+    .main{display:grid;grid-template-columns:1fr 1.28fr 190px;gap:14px}.card{background:var(--panel);border:3px solid var(--line);border-radius:14px;padding:14px;min-height:330px}.card h2{font-size:19px;margin:0 0 12px;color:var(--deep)}
+    .hint{background:#f8dfd8;border:3px solid var(--line);border-radius:8px;padding:12px;margin-bottom:14px;font-size:14px;line-height:1.45}
+    .addrow{display:grid;grid-template-columns:1.5fr .7fr .7fr;gap:8px;margin-bottom:10px}.btn{border:2px solid var(--line);background:var(--accent);color:white;border-radius:10px;padding:12px 14px;font-weight:900;font-size:15px;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.12)}.btn.secondary{background:#fff8ef;color:var(--deep)}.btn.danger{background:#c75d4f;color:white}.btn.full{width:100%;margin-bottom:10px}.btn:active{transform:translateY(1px)}
+    .item{display:grid;grid-template-columns:32px 1fr 74px 72px 40px;gap:8px;align-items:center;background:#fffaf3;border:2px solid #e1c8aa;border-radius:10px;padding:8px;margin:8px 0}.item input[type="checkbox"]{width:22px;height:22px}.iconbtn{border:0;background:transparent;font-size:22px;cursor:pointer;color:var(--danger)}
+    .priority{font-size:16px;line-height:1.8}.priority .empty{color:#8c7462}.actions{display:flex;flex-direction:column;gap:10px}.output{margin-top:14px;background:var(--blue);border:3px solid var(--line);border-radius:14px;padding:14px}.outputHead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}.output h2{font-size:19px;margin:0;color:#21425f}.small{font-size:13px;color:#6f5947;margin-top:8px}.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%);background:#4d3528;color:white;padding:12px 18px;border-radius:999px;opacity:0;pointer-events:none;transition:.25s}.toast.show{opacity:1}
+    @media(max-width:900px){.topgrid,.main{grid-template-columns:1fr}.actions{flex-direction:row;flex-wrap:wrap}.btn.full{width:auto;flex:1}.app{padding:12px}.wrap{padding:10px}.item{grid-template-columns:32px 1fr 64px 64px 36px}.tabs{width:100%}.tab{flex:1}}
+  </style>
+</head>
+<body>
+<div class="wrap"><div class="app">
+  <header><h1>🍳 冷蔵庫メニュー相談</h1><div class="tabs"><button class="tab active" data-tab="fridge">冷蔵庫</button><button class="tab" data-tab="freezer">冷凍庫</button></div></header>
+  <div class="topgrid">
+    <div class="field"><label>作りたい料理（任意）</label><input id="dish" placeholder="例：カレー、親子丼、ハンバーグ" /></div>
+    <div class="field"><label>メモ（任意）</label><input id="memo" placeholder="例：簡単、和食、子ども向け など" /></div>
+    <div class="field"><label>人数</label><input id="people" placeholder="例：2人分" /></div>
+    <div class="field"><label>何食分</label><input id="meals" placeholder="例：2食分" /></div>
+  </div>
+  <div class="main">
+    <section class="card"><h2 id="listTitle">食材リスト</h2><div class="addrow"><input id="name" placeholder="食材名" /><input id="amount" placeholder="数量" /><input id="unit" placeholder="単位" /></div><button class="btn full" id="addBtn">＋ 食材を追加</button><div id="items"></div><p class="small">チェックを付けると「優先して使いたい食材」に入ります。内容は自動保存されます。</p></section>
+    <section><div class="hint">左のリストにチェックをつけると、下の「優先食材リスト」に反映されます。冷蔵庫・冷凍庫の両方から優先食材として文章に入ります。</div><div class="card"><h2>優先食材リスト</h2><div class="priority" id="priority"></div></div></section>
+    <section class="actions"><button class="btn full" id="genBtn">文章実行ボタン</button><button class="btn secondary full" id="copyBtn">文章コピー</button><button class="btn danger full" id="clearTabBtn">このタブを全削除</button></section>
+  </div>
+  <section class="output"><div class="outputHead"><h2>文章表示</h2><button class="btn secondary" id="copyBtn2">コピー</button></div><textarea id="output" readonly></textarea><p class="small">生成した文章をコピーして、ChatGPTなどに貼り付けて使ってください。</p></section>
+</div></div><div id="toast" class="toast">コピーしました</div>
+<script>
+const KEY='reizouko-menu-v2';
+const stateDefault={active:'fridge',meta:{dish:'',memo:'',people:'2人分',meals:'1食分'},fridge:[],freezer:[]};
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||stateDefault;
+const $=id=>document.getElementById(id);
+function save(){localStorage.setItem(KEY,JSON.stringify(state));}
+function fmt(i){return `${i.name}${i.amount?` ${i.amount}${i.unit||''}`:''}`.trim();}
+function current(){return state[state.active];}
+function render(){
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===state.active));
+  $('listTitle').textContent=state.active==='fridge'?'冷蔵庫の食材リスト':'冷凍庫の食材リスト';
+  $('dish').value=state.meta.dish||'';$('memo').value=state.meta.memo||'';$('people').value=state.meta.people||'';$('meals').value=state.meta.meals||'';
+  $('items').innerHTML='';
+  current().forEach((it,idx)=>{
+    const div=document.createElement('div'); div.className='item';
+    div.innerHTML=`<input type="checkbox" ${it.priority?'checked':''} aria-label="優先"><input value="${esc(it.name)}" placeholder="食材名"><input value="${esc(it.amount)}" placeholder="数量"><input value="${esc(it.unit)}" placeholder="単位"><button class="iconbtn" title="削除">🗑</button>`;
+    const inputs=div.querySelectorAll('input');
+    inputs[0].onchange=e=>{it.priority=e.target.checked;save();renderPriority();generate();};
+    inputs[1].oninput=e=>{it.name=e.target.value;save();renderPriority();generate();};
+    inputs[2].oninput=e=>{it.amount=e.target.value;save();renderPriority();generate();};
+    inputs[3].oninput=e=>{it.unit=e.target.value;save();renderPriority();generate();};
+    div.querySelector('button').onclick=()=>{current().splice(idx,1);save();render();generate();};
+    $('items').appendChild(div);
+  });
+  renderPriority(); generate();
+}
+function esc(s){return String(s||'').replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('"','&quot;');}
+function renderPriority(){
+  const all=[...state.fridge,...state.freezer].filter(i=>i.priority&&i.name.trim());
+  $('priority').innerHTML=all.length?all.map(i=>'・'+esc(fmt(i))).join('<br>'):'<span class="empty">まだ優先食材はありません</span>';
+}
+function listText(arr){return arr.filter(i=>i.name.trim()).map(i=>'・'+fmt(i)).join('\n')||'・なし';}
+function priorityText(){const all=[...state.fridge,...state.freezer].filter(i=>i.priority&&i.name.trim());return all.length?all.map(i=>'・'+fmt(i)).join('\n'):'・なし';}
+function generate(){
+  const dish=state.meta.dish.trim(); const memo=state.meta.memo.trim();
+  const text=`私は現在以下の食材を持っています。\n\n冷蔵庫の食材\n${listText(state.fridge)}\n\n冷凍庫内の食材（すべて冷凍品）\n${listText(state.freezer)}\n\n【優先して使いたい食材】\n${priorityText()}\n\n【作りたい料理】\n${dish||'未指定'}\n\n【条件】\n・${state.meta.people||'人数未指定'}\n・${state.meta.meals||'食数未指定'}${memo?`\n・${memo}`:''}\n\n質問1\n現在の材料だけで作れる料理を\n3個程度提案してください。\n\nできるだけ簡単なものから優先してください。\n\n質問2\n${dish||'指定した料理'}を作る場合、\n不足している材料を教えてください。\n\n質問3\n不足している材料の目安量も教えてください。\n\n回答は以下の形式でお願いします。\n\n【作れる料理】\n①\n②\n③\n\n【不足食材】\n・\n\n【作り方概要】`;
+  $('output').value=text; save();
+}
+function addItem(){const n=$('name').value.trim(); if(!n)return; current().push({name:n,amount:$('amount').value.trim(),unit:$('unit').value.trim(),priority:false}); $('name').value='';$('amount').value='';$('unit').value='';save();render();}
+async function copyText(){generate(); try{await navigator.clipboard.writeText($('output').value);toast('コピーしました');}catch(e){$('output').select();document.execCommand('copy');toast('コピーしました');}}
+function toast(t){const el=$('toast');el.textContent=t;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),1500)}
+['dish','memo','people','meals'].forEach(id=>$(id).addEventListener('input',e=>{state.meta[id]=e.target.value;generate();}));
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{state.active=b.dataset.tab;save();render();});
+$('addBtn').onclick=addItem; $('genBtn').onclick=generate; $('copyBtn').onclick=copyText; $('copyBtn2').onclick=copyText;
+$('clearTabBtn').onclick=()=>{if(confirm((state.active==='fridge'?'冷蔵庫':'冷凍庫')+'の食材を全部削除しますか？')){state[state.active]=[];save();render();}};
+['name','amount','unit'].forEach(id=>$(id).addEventListener('keydown',e=>{if(e.key==='Enter')addItem();}));
+if(!state.fridge) state=stateDefault; render();
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(()=>{});}
+</script>
+</body></html>
